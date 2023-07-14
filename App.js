@@ -1,42 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, Image ,Dimensions} from 'react-native';
-import SliderItem from './SliderItem.js';
+import React, { useState, useRef } from 'react';
+import { View, TouchableOpacity, StyleSheet, Text, SafeAreaView, } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
-const App = () => {
-  const [currentIndex,setCurrentIndex]=useState(0);
-  const images = [
-    { id: 1, source: require('./assets/images/slide1.jpeg') },
-    { id: 2, source: require('./assets/images/slide2.jpeg') },
-    { id: 3, source: require('./assets/images/slide3.jpeg') },
-    { id: 4, source: require('./assets/images/slide4.jpeg') },
-    { id: 5, source: require('./assets/images/slide5.jpeg') },
-    { id: 6, source: require('./assets/images/slide6.jpeg') },
-  ];
-
+function App() {
+  const [btn, setbtn] = useState(true)
+  const ht = useSharedValue(130)
+  console.log('Initial btn value', btn)
+  console.log('initial height.value', ht.value)
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(ht.value, { duration: 200 }),
+    }
+  })
   return (
-    <View style={{ flex: 1,justifyContent:'center',alignItems:'center'}}>
-      <FlatList
-        data={images}
-        horizontal
-        onScroll={e=>{
-          const X=e.nativeEvent.contentOffset.x;
-          console.log('Dimension.get(window).width',Dimensions.get('window').width)
-          console.log('X',X);
-          let currIndex=Math.floor((X/(Dimensions.get('window').width-60).toFixed(0)))
-          console.log('currIndex',currIndex)
-          setCurrentIndex(currIndex)
-          console.log(',,lkhiajk',(X/(Dimensions.get('window').width)));
-          console.log('CurrentIndex:',currentIndex)
-        }
-        }
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => {
-          return <SliderItem image={item.source} index={index} currentIndex={currentIndex}/>;
-        }}
-        keyExtractor={(item, index) => index.toString()}
-      />
-    </View>
-  );
-};
+    <SafeAreaView style={styles.outercontainer}>
+      <Animated.View style={[styles.container, animatedStyle]}>
+        <TouchableOpacity activeOpacity={true} style={styles.btn} onPress={() => {
+          setbtn(!btn),
+          ht.value = btn ? 130 : 400;
+        }}>
+          {!btn ? <Text style={styles.txtbtncss}>SHOW MORE</Text> : <Text style={styles.txtbtncss}>SHOW LESS</Text>}
+        </TouchableOpacity>
+        <Text style={{ color: "white",fontSize:16 }}>
+          When using an application, the smooth movement of objects, pages, modals, and other components improves our UX and encourages users to return. No one wants to use an app that glitches and{!btn?<>.....</>:null} does not move properly.
+          Creating animations and object transitions might be a burden for frontend developers since we typically want to focus on writing code for our application and not bother calculating where to place an object or where to move that object when a user hits an event on our application.
+          Working with UI designers can also be a challenge, especially when expectations are misaligned — for example, when designers expect to see their complex animations recreated as-is. Finding a good tool and package to solve this issue is not so easy, either — but that is exactly why the react-native-reanimated package was built.
+        </Text>
+      </Animated.View>
+    </SafeAreaView>
+  )
 
+}
+const styles = StyleSheet.create({
+  outercontainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  container: {
+    borderWidth: 2,
+    borderColor: 'black',
+    backgroundColor: 'black',
+    borderRadius: 10,
+    paddingHorizontal: 5
+  },
+  txtbtncss: {
+    backgroundColor: 'blue',
+    fontSize: 20,
+    color: 'white',
+    padding: 5,
+  },
+
+  btn: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: '2%',
+  }
+})
 export default App;
